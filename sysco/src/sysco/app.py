@@ -8,8 +8,8 @@ from toga.style.pack import COLUMN, ROW
 
 
 class HelloWorld(toga.App):
-    def say_hello(self, widget):
-            print(f"Hello, {self.name_input.value}")
+    async def say_hello(self, widget):
+            await self.main_window.dialog(toga.InfoDialog(f"Hello, {self.name_input.value}", "Hi there!",))
     def startup(self):
         """Construct and show the Toga application.
 
