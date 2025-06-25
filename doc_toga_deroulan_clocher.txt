@@ -1,0 +1,234 @@
+Dans Toga, les "cases à cocher" sont représentées par le widget `toga.Switch` et les "menus déroulants" par `toga.Selection`. Voici comment les utiliser, avec leurs différentes options.
+
+-----
+
+### 1\. `toga.Switch` (Case à cocher / Commutateur)
+
+Le `toga.Switch` est un widget qui permet à l'utilisateur d'activer ou de désactiver une option. Il peut apparaître comme une case à cocher classique ou un interrupteur à bascule (selon la plateforme native).
+
+**Paramètres du constructeur `toga.Switch()`:**
+
+1.  **`text` (obligatoire)**:
+
+      * Type: `str`
+      * Description: Le texte affiché à côté du commutateur.
+      * Exemple: `toga.Switch("Activer la fonction X")`
+
+2.  **`value` (optionnel)**:
+
+      * Type: `bool`
+      * Description: L'état initial du commutateur. `True` pour coché/activé, `False` pour décoché/désactivé.
+      * Valeur par défaut: `False`
+      * Exemple: `toga.Switch("Option pré-cochée", value=True)`
+
+3.  **`on_change` (optionnel)**:
+
+      * Type: `callable` (une fonction ou une méthode) ou `None`
+      * Description: La fonction qui sera appelée lorsque l'utilisateur change l'état du commutateur. Cette fonction reçoit le widget `Switch` lui-même comme argument.
+      * Exemple:
+        ```python
+        def my_switch_handler(widget):
+            if widget.value:
+                print("Le commutateur est maintenant activé.")
+            else:
+                print("Le commutateur est maintenant désactivé.")
+        my_switch = toga.Switch("Mon commutateur", on_change=my_switch_handler)
+        ```
+
+4.  **`id` (optionnel)**:
+
+      * Type: `str` ou `None`
+      * Description: Un identifiant unique pour le widget.
+      * Exemple: `toga.Switch("Notifications", id="notif_switch")`
+
+5.  **`enabled` (optionnel)**:
+
+      * Type: `bool`
+      * Description: Définit si le commutateur est initialement activé (interactif) ou désactivé (grisé et non modifiable).
+      * Valeur par défaut: `True`
+      * Exemple: `toga.Switch("Inaccessible", enabled=False)`
+
+6.  **`style` (optionnel)**:
+
+      * Type: `toga.style.Pack` ou `None`
+      * Description: Un objet style `Pack` pour contrôler l'apparence et la mise en page (marges, alignement, couleur du texte, taille de police, etc.).
+      * Exemple: `toga.Switch("Important", style=Pack(margin_top=10, color="red"))`
+
+7.  **`**kwargs` (optionnel)**:
+
+      * Comme pour les autres widgets, vous pouvez passer des propriétés de style directement comme `kwargs`.
+
+**Propriétés modifiables après la création:**
+
+  * **`switch.text`**: Lire ou modifier le texte du commutateur.
+  * **`switch.value`**: Lire ou modifier l'état du commutateur (True/False).
+  * **`switch.on_change`**: Modifier le gestionnaire d'événements `on_change`.
+  * **`switch.enabled`**: Lire ou modifier l'état activé/désactivé.
+  * **`switch.style`**: Modifier les propriétés de style.
+
+**Exemple `toga.Switch`:**
+
+```python
+import toga
+from toga.style.pack import Pack, COLUMN, CENTER, TOP
+
+class SwitchApp(toga.App):
+    def startup(self):
+        main_box = toga.Box(style=Pack(direction=COLUMN, padding=20, alignment=CENTER))
+
+        self.status_label = toga.Label(
+            "Notifications désactivées.",
+            style=Pack(margin_bottom=15, font_size=14)
+        )
+        main_box.add(self.status_label)
+
+        def handle_notifications_change(widget):
+            if widget.value:
+                self.status_label.text = "Notifications activées !"
+                self.status_label.style.color = "green"
+            else:
+                self.status_label.text = "Notifications désactivées."
+                self.status_label.style.color = "red"
+
+        self.notifications_switch = toga.Switch(
+            "Activer les notifications",
+            value=False, # État initial
+            on_change=handle_notifications_change,
+            style=Pack(margin_bottom=10)
+        )
+        main_box.add(self.notifications_switch)
+
+        # Un autre switch avec un état initial différent
+        self.dark_mode_switch = toga.Switch(
+            "Mode Sombre",
+            value=True,
+            on_change=lambda s: print(f"Mode Sombre: {s.value}"),
+            style=Pack(margin_top=10)
+        )
+        main_box.add(self.dark_mode_switch)
+
+        self.main_window = toga.MainWindow(title=self.formal_name)
+        self.main_window.content = main_box
+        self.main_window.show()
+
+def main():
+    return SwitchApp('Switch Demo', 'org.beeware.switchdemo')
+
+if __name__ == '__main__':
+    main().main_loop()
+```
+
+-----
+
+### 2\. `toga.Selection` (Menu déroulant / ComboBox)
+
+Le `toga.Selection` est un widget qui permet à l'utilisateur de choisir une option parmi une liste prédéfinie. Il est souvent rendu comme un menu déroulant ou une "combobox" sur les plateformes natives.
+
+**Paramètres du constructeur `toga.Selection()`:**
+
+1.  **`items` (optionnel)**:
+
+      * Type: `list` ou `tuple` de `str`
+      * Description: La liste des éléments à afficher dans le menu déroulant.
+      * Exemple: `toga.Selection(items=["Option A", "Option B", "Option C"])`
+
+2.  **`on_change` (optionnel)**:
+
+      * Type: `callable` (une fonction ou une méthode) ou `None`
+      * Description: La fonction qui sera appelée lorsque l'utilisateur sélectionne un nouvel élément dans la liste. Cette fonction reçoit le widget `Selection` lui-même comme argument.
+      * Exemple:
+        ```python
+        def my_selection_handler(widget):
+            print(f"Option sélectionnée: {widget.value}")
+        my_selection = toga.Selection(items=["Apple", "Banana"], on_change=my_selection_handler)
+        ```
+
+3.  **`id` (optionnel)**:
+
+      * Type: `str` ou `None`
+      * Description: Un identifiant unique pour le widget.
+
+4.  **`enabled` (optionnel)**:
+
+      * Type: `bool`
+      * Description: Définit si le menu déroulant est initialement activé.
+      * Valeur par défaut: `True`
+
+5.  **`style` (optionnel)**:
+
+      * Type: `toga.style.Pack` ou `None`
+      * Description: Un objet style `Pack` pour contrôler l'apparence et la mise en page (marges, largeur, etc.).
+
+6.  **`**kwargs` (optionnel)**:
+
+      * Comme pour les autres widgets, vous pouvez passer des propriétés de style directement comme `kwargs`.
+
+**Propriétés modifiables après la création:**
+
+  * **`selection.items`**: Lire ou modifier la liste des éléments disponibles dans le menu déroulant. Notez que changer `items` réinitialisera généralement la sélection à `None` ou au premier élément.
+  * **`selection.value`**: Lire ou modifier l'élément actuellement sélectionné. C'est la *valeur* (la chaîne de caractères) de l'élément sélectionné, pas son index. Si rien n'est sélectionné, ce sera `None`.
+  * **`selection.on_change`**: Modifier le gestionnaire d'événements `on_change`.
+  * **`selection.enabled`**: Lire ou modifier l'état activé/désactivé.
+  * **`selection.style`**: Modifier les propriétés de style.
+
+**Exemple `toga.Selection`:**
+
+```python
+import toga
+from toga.style.pack import Pack, COLUMN, CENTER, TOP
+
+class SelectionApp(toga.App):
+    def startup(self):
+        main_box = toga.Box(style=Pack(direction=COLUMN, padding=20, alignment=CENTER))
+
+        self.fruit_label = toga.Label(
+            "Aucun fruit sélectionné.",
+            style=Pack(margin_bottom=15, font_size=14)
+        )
+        main_box.add(self.fruit_label)
+
+        def handle_fruit_selection(widget):
+            selected_fruit = widget.value # widget.value contient l'élément sélectionné
+            if selected_fruit:
+                self.fruit_label.text = f"Fruit sélectionné : {selected_fruit}"
+                self.fruit_label.style.color = "purple"
+            else:
+                self.fruit_label.text = "Aucun fruit sélectionné."
+                self.fruit_label.style.color = "black"
+
+        self.fruit_selection = toga.Selection(
+            items=["Pomme", "Banane", "Orange", "Mangue"],
+            on_change=handle_fruit_selection,
+            style=Pack(width=200, margin_bottom=10) # Donner une largeur pour une meilleure apparence
+        )
+        main_box.add(self.fruit_selection)
+
+        # Bouton pour ajouter un élément dynamiquement
+        add_button = toga.Button(
+            "Ajouter Citron",
+            on_press=self.add_lemon,
+            style=Pack(margin_top=10)
+        )
+        main_box.add(add_button)
+
+        self.main_window = toga.MainWindow(title=self.formal_name)
+        self.main_window.content = main_box
+        self.main_window.show()
+
+    def add_lemon(self, widget):
+        current_items = list(self.fruit_selection.items) # Convertir en liste pour modifier
+        if "Citron" not in current_items:
+            current_items.append("Citron")
+            self.fruit_selection.items = current_items # Mettre à jour la liste des éléments
+            print("Citron ajouté aux options.")
+        else:
+            print("Citron est déjà dans la liste.")
+
+def main():
+    return SelectionApp('Selection Demo', 'org.beeware.selectiondemo')
+
+if __name__ == '__main__':
+    main().main_loop()
+```
+
+Ces deux widgets sont essentiels pour créer des formulaires et des interfaces utilisateur interactives où l'utilisateur doit faire des choix.

@@ -1,0 +1,199 @@
+Absolument \! Dans Toga, "insérer un lien" et "changer de page" peuvent être interprétés de différentes manières, car Toga est un toolkit GUI natif, pas un framework web.
+
+Je vais aborder les deux cas :
+
+1.  **Lien vers une ressource externe (hyperlien) :** Comment ouvrir une URL dans le navigateur web par défaut de l'utilisateur.
+2.  **Changer de "page" (navigation interne) :** Comment modifier le contenu d'une fenêtre Toga pour simuler une navigation entre différentes vues ou "pages" de votre application.
+
+-----
+
+### 1\. Insérer un lien vers une ressource externe (Hyperlien)
+
+Toga n'a pas de widget `Hyperlink` ou `Link` natif comme on pourrait le trouver en HTML. Pour créer un lien cliquable qui ouvre une URL dans le navigateur par défaut de l'utilisateur, vous utilisez généralement un `toga.Button` ou un `toga.Label` stylisé comme un lien, et vous le combinez avec le module standard `webbrowser` de Python.
+
+**Étapes :**
+
+1.  **Utiliser un `toga.Button` :** C'est l'approche la plus simple et la plus courante.
+2.  **Utiliser `webbrowser.open()` :** Cette fonction du module `webbrowser` est conçue pour ouvrir des URL dans le navigateur web par défaut du système.
+
+**Exemple :**
+
+```python
+import toga
+import webbrowser
+from toga.style.pack import Pack, COLUMN, CENTER
+
+class LinkApp(toga.App):
+    def startup(self):
+        main_box = toga.Box(
+            style=Pack(direction=COLUMN, padding=20, alignment=CENTER)
+        )
+
+        # Label d'introduction
+        intro_label = toga.Label(
+            "Visitez le site web BeeWare :",
+            style=Pack(margin_bottom=10)
+        )
+        main_box.add(intro_label)
+
+        # Bouton agissant comme un lien
+        def open_beeware_website(widget):
+            webbrowser.open("https://beeware.org/")
+            print("Ouverture de https://beeware.org/ dans le navigateur.")
+
+        link_button = toga.Button(
+            "BeeWare.org",
+            on_press=open_beeware_website,
+            style=Pack(
+                color="blue", # Pour lui donner l'apparence d'un lien
+                text_align=CENTER,
+                background_color="transparent", # Pas de fond de bouton
+                padding=(5, 0), # Réduire le padding par défaut du bouton
+                # Pour un effet souligné, il faudrait un peu plus de travail ou un widget personnalisé
+            )
+        )
+        main_box.add(link_button)
+
+        # Autre exemple : un WebView si vous voulez afficher le contenu DANS votre application
+        # Cela ouvre un navigateur intégré à votre app, pas le navigateur système.
+        # webview_button = toga.Button(
+        #     "Afficher BeeWare dans l'app",
+        #     on_press=self.show_webview_page, # Une fonction pour changer de page
+        #     style=Pack(margin_top=20)
+        # )
+        # main_box.add(webview_button)
+
+
+        self.main_window = toga.MainWindow(title=self.formal_name)
+        self.main_window.content = main_box
+        self.main_window.show()
+
+    # Si vous voulez afficher le site dans l'app (page 2)
+    def show_webview_page(self, widget):
+        webview_box = toga.Box(style=Pack(direction=COLUMN))
+        webview = toga.WebView(url="https://beeware.org/", style=Pack(flex=1))
+        back_button = toga.Button(
+            "Retour",
+            on_press=self.go_back_to_main_page,
+            style=Pack(margin=10)
+        )
+        webview_box.add(webview)
+        webview_box.add(back_button)
+        self.main_window.content = webview_box
+
+    def go_back_to_main_page(self, widget):
+        # Recréer la page principale ou la stocker et la recharger
+        self.startup() # Simplement pour cet exemple, en pratique vous la stockeriez
+        # Si vous l'aviez stockée:
+        # self.main_window.content = self.main_page_content_box
+
+
+def main():
+    return LinkApp('Link Demo', 'org.beeware.linkdemo')
+
+if __name__ == '__main__':
+    main().main_loop()
+```
+
+**Considérations pour les hyperliens :**
+
+  * **Apparence de lien :** Vous devrez styliser manuellement un `toga.Button` (couleur bleue, pas de fond) pour qu'il ressemble à un lien traditionnel. L'effet de soulignement est plus difficile à obtenir directement sur un `toga.Button` ou `toga.Label`. Si vous avez besoin d'un contrôle précis, vous pourriez envisager un widget personnalisé.
+  * **`toga.WebView` :** Si vous souhaitez afficher une page web *dans* votre application Toga sans ouvrir le navigateur externe, vous pouvez utiliser `toga.WebView`. Cependant, un `WebView` est un navigateur web complet intégré et non pas un simple hyperlien. Il est lourd et peut ne pas être ce que vous cherchez pour un simple lien. J'ai inclus un exemple commenté ci-dessus.
+
+-----
+
+### 2\. Changer de "page" (Navigation Interne)
+
+Dans une application Toga, il n'y a pas de concept direct de "pages" ou "écrans" comme dans les frameworks de développement web ou mobile traditionnels avec des routeurs. Au lieu de cela, vous changez le **contenu** de votre `toga.MainWindow` (ou de tout autre conteneur principal) pour afficher une vue différente.
+
+**Méthodes pour changer de page :**
+
+  * **Changer `window.content` :** C'est la méthode la plus directe et la plus courante. L'attribut `content` d'une `toga.Window` (ou de votre `toga.Box` principale) prend un widget (souvent un `toga.Box` contenant d'autres widgets) et l'affiche.
+
+  * **Utiliser des conteneurs de navigation :** Pour des applications plus complexes, Toga offre des conteneurs qui facilitent la gestion de plusieurs "pages" :
+
+      * **`toga.OptionContainer` :** Similaire à des onglets ou un sélecteur de vues. Vous définissez plusieurs "panneaux", et l'utilisateur (ou votre code) peut passer de l'un à l'autre.
+      * **`toga.SplitContainer` :** Permet de diviser l'écran en deux zones redimensionnables, chacune pouvant contenir sa propre "page" de contenu.
+
+**Exemple de changement de `window.content` :**
+
+```python
+import toga
+from toga.style.pack import Pack, COLUMN, CENTER, ROW, TOP
+
+class MultiPageApp(toga.App):
+    def startup(self):
+        self.main_window = toga.MainWindow(title=self.formal_name)
+
+        # Créer les "pages" (en tant que Box conteneurs)
+        self.page1_content = self.create_page1()
+        self.page2_content = self.create_page2()
+
+        # Afficher la première page au démarrage
+        self.main_window.content = self.page1_content
+        self.main_window.show()
+
+    def create_page1(self):
+        box = toga.Box(style=Pack(direction=COLUMN, padding=20, alignment=CENTER))
+        box.add(toga.Label("Bienvenue sur la Page 1", style=Pack(font_size=24, margin_bottom=20)))
+        
+        button_to_page2 = toga.Button(
+            "Aller à la Page 2",
+            on_press=self.go_to_page2,
+            style=Pack(padding=10)
+        )
+        box.add(button_to_page2)
+        return box
+
+    def create_page2(self):
+        box = toga.Box(style=Pack(direction=COLUMN, padding=20, alignment=CENTER))
+        box.add(toga.Label("Vous êtes sur la Page 2", style=Pack(font_size=24, margin_bottom=20, color="green")))
+        
+        button_to_page1 = toga.Button(
+            "Retour à la Page 1",
+            on_press=self.go_to_page1,
+            style=Pack(padding=10)
+        )
+        box.add(button_to_page1)
+
+        # Exemple d'un bouton qui ouvre un lien externe depuis cette page
+        def open_google(widget):
+            webbrowser.open("https://www.google.com")
+            print("Ouverture de Google.")
+
+        google_button = toga.Button(
+            "Rechercher sur Google",
+            on_press=open_google,
+            style=Pack(margin_top=20, color="blue", background_color="transparent")
+        )
+        box.add(google_button)
+
+        return box
+
+    def go_to_page2(self, widget):
+        self.main_window.content = self.page2_content
+        self.main_window.title = "Ma Super App - Page 2" # Mettre à jour le titre de la fenêtre
+
+    def go_to_page1(self, widget):
+        self.main_window.content = self.page1_content
+        self.main_window.title = "Ma Super App - Page 1"
+
+def main():
+    return MultiPageApp('Multi-Page Demo', 'org.beeware.multipagedemo')
+
+if __name__ == '__main__':
+    main().main_loop()
+```
+
+**Explication du changement de page :**
+
+  * Nous définissons des fonctions (`create_page1`, `create_page2`) qui retournent des instances de `toga.Box` (ou d'autres conteneurs) contenant les widgets spécifiques à chaque "page".
+  * Les fonctions `go_to_page1` et `go_to_page2` sont des gestionnaires d'événements pour les boutons de navigation.
+  * Elles modifient simplement l'attribut `self.main_window.content` pour basculer la vue.
+  * Vous pouvez également changer le `self.main_window.title` pour indiquer à l'utilisateur où il se trouve.
+
+**Pour des applications plus complexes avec de nombreuses pages :**
+
+Vous pourriez vouloir mettre en place un gestionnaire de navigation plus sophistiqué, par exemple une classe `Navigator` qui maintient une pile de pages, permettant des fonctions "retour" (back) et "avancer" (forward), un peu comme un navigateur web. Mais pour des besoins de base, la simple modification de `window.content` est suffisante.
+
+J'espère que ces explications vous aident à comprendre comment insérer des liens et gérer la navigation dans Toga \!

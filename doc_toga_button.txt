@@ -1,0 +1,179 @@
+Le widget `toga.Button` est un élément interactif fondamental dans Toga, permettant aux utilisateurs de déclencher des actions en cliquant dessus. Voici les différentes options que vous pouvez configurer pour un `toga.Button` :
+
+### Paramètres du constructeur `toga.Button()`
+
+1.  **`text` (obligatoire si `icon` n'est pas fourni)** :
+
+      * Type : `str`
+      * Description : Le texte à afficher sur le bouton. Ce sera le libellé visible pour l'utilisateur. Si un `icon` est fourni, le `text` sera ignoré ou remplacé par l'icône, selon la plateforme native.
+      * Exemple : `toga.Button("Cliquez-moi")`
+
+2.  **`icon` (optionnel)** :
+
+      * Type : `toga.Icon` ou `None`
+      * Description : Une icône à afficher sur le bouton au lieu ou en plus du texte, selon la plateforme. L'icône sera redimensionnée pour s'adapter au bouton.
+      * Exemple : `toga.Button(icon=toga.Icon("resources/star"))`
+      * **Note importante** : Un bouton ne peut généralement pas afficher à la fois du texte et une icône de manière standard sur toutes les plateformes natives. Si vous fournissez les deux, Toga donnera la priorité à l'un ou à l'autre (souvent l'icône) ou se comportera de manière spécifique à la plateforme. Pour avoir les deux, il faudrait souvent un widget personnalisé ou une `toga.Box` contenant un `toga.Icon` et un `toga.Label` qui se comporte comme un bouton.
+
+3.  **`on_press` (optionnel)** :
+
+      * Type : `callable` (une fonction ou une méthode) ou `None`
+      * Description : La fonction (appelée "handler" ou "callback") qui sera exécutée lorsque l'utilisateur clique sur le bouton. Cette fonction reçoit généralement le widget `Button` lui-même comme argument.
+      * Exemple :
+        ```python
+        def my_button_handler(widget):
+            print("Le bouton a été pressé !")
+
+        my_button = toga.Button("Action", on_press=my_button_handler)
+        ```
+      * **Attention** : Ne mettez pas de parenthèses après le nom de la fonction (ex: `on_press=my_button_handler()` est incorrect car cela appellerait la fonction immédiatement lors de la création du bouton).
+
+4.  **`enabled` (optionnel)** :
+
+      * Type : `bool`
+      * Description : Définit si le bouton est initialement activé (cliquable) ou désactivé (grisé et non cliquable).
+      * Valeur par défaut : `True`
+      * Exemple : `toga.Button("Disabled Button", enabled=False)`
+
+5.  **`id` (optionnel)** :
+
+      * Type : `str` ou `None`
+      * Description : Un identifiant unique pour le widget, utile pour le référencer programmatiquement ou pour le débogage.
+      * Exemple : `toga.Button("Submit", id="submit_button")`
+
+6.  **`style` (optionnel)** :
+
+      * Type : `toga.style.Pack` ou `None`
+      * Description : Un objet style `Pack` qui définit l'apparence et la mise en page du bouton (couleur du texte, couleur de fond, taille de police, marges, etc.). C'est ici que vous contrôlez la majorité de l'aspect visuel.
+      * Exemple :
+        ```python
+        from toga.style.pack import Pack, BLUE, BOLD
+
+        my_button = toga.Button(
+            "Go!",
+            on_press=my_handler,
+            style=Pack(
+                background_color=BLUE,
+                color="white", # Couleur du texte
+                font_weight=BOLD,
+                padding=10
+            )
+        )
+        ```
+      * (Consultez ma réponse précédente sur `toga.style.Pack` pour toutes les options de style.)
+
+7.  **`**kwargs` (optionnel)** :
+
+      * Toga permet de passer des propriétés de style directement comme `kwargs` au constructeur du widget. Ces `kwargs` seront automatiquement utilisés pour construire l'objet `Pack` du style du bouton.
+      * Exemple :
+        ```python
+        my_button = toga.Button(
+            "Large Button",
+            on_press=my_handler,
+            font_size=20,
+            margin_top=15
+        )
+        ```
+        Ceci est équivalent à :
+        ```python
+        from toga.style.pack import Pack
+        my_button = toga.Button(
+            "Large Button",
+            on_press=my_handler,
+            style=Pack(
+                font_size=20,
+                margin_top=15
+            )
+        )
+        ```
+
+### Propriétés modifiables après la création du Bouton
+
+Une fois qu'un `toga.Button` est créé, vous pouvez modifier dynamiquement ses propriétés :
+
+1.  **`button.text`**:
+
+      * Lecture ou modification du texte affiché sur le bouton.
+      * Exemple : ` my_button.text = "Cliquez encore !"  `
+
+2.  **`button.icon`**:
+
+      * Lecture ou modification de l'icône du bouton. Si vous définissez une icône alors qu'il y avait du texte, l'icône remplacera souvent le texte (dépend de la plateforme).
+      * Exemple : `my_button.icon = toga.Icon("resources/new_icon")`
+
+3.  **`button.on_press`**:
+
+      * Modifier le gestionnaire d'événements `on_press`.
+      * Exemple : `my_button.on_press = new_handler_function`
+
+4.  **`button.enabled`**:
+
+      * Lire ou modifier l'état activé/désactivé du bouton.
+      * Exemple : `my_button.enabled = False` (pour désactiver le bouton)
+
+5.  **`button.style`**:
+
+      * L'attribut `.style` est un objet `toga.style.Pack` que vous pouvez modifier pour changer l'apparence du bouton à tout moment.
+      * Exemple : `my_button.style.background_color = toga.GREEN`
+
+### Exemple simple d'utilisation
+
+```python
+import toga
+from toga.style.pack import Pack, COLUMN, CENTER, RED, BLUE, BOLD
+
+class ButtonApp(toga.App):
+    def startup(self):
+        main_box = toga.Box(
+            style=Pack(direction=COLUMN, padding=20, alignment=CENTER)
+        )
+
+        self.clicks = 0
+        self.status_label = toga.Label(
+            f"Bouton cliqué {self.clicks} fois",
+            style=Pack(margin_bottom=15, font_size=14)
+        )
+        main_box.add(self.status_label)
+
+        def handle_button_press(widget):
+            self.clicks += 1
+            self.status_label.text = f"Bouton cliqué {self.clicks} fois"
+            if self.clicks % 2 == 0:
+                widget.style.background_color = BLUE
+                widget.style.color = toga.WHITE
+            else:
+                widget.style.background_color = RED
+                widget.style.color = toga.WHITE
+
+            if self.clicks >= 5:
+                # Désactiver le bouton après 5 clics
+                widget.enabled = False
+                widget.text = "Trop cliqué !"
+                self.status_label.text += " (bouton désactivé)"
+
+        # Création du bouton avec les options
+        self.my_button = toga.Button(
+            "Cliquez ici !",
+            on_press=handle_button_press,
+            style=Pack(
+                font_size=18,
+                padding=10,
+                background_color=RED,
+                color=toga.WHITE,
+                width=200 # Fixer une largeur
+            )
+        )
+        main_box.add(self.my_button)
+
+        self.main_window = toga.MainWindow(title=self.formal_name)
+        self.main_window.content = main_box
+        self.main_window.show()
+
+def main():
+    return ButtonApp('Button Demo', 'org.beeware.buttondemo')
+
+if __name__ == '__main__':
+    main().main_loop()
+```
+
+Le `toga.Button` est un widget polyvalent grâce à sa capacité à déclencher des fonctions Python et à être entièrement stylisé, ce qui est essentiel pour créer des interfaces utilisateur interactives.

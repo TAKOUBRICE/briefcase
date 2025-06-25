@@ -1,0 +1,153 @@
+Le widget `toga.Label` est un des widgets les plus simples de Toga, principalement utilisé pour afficher du texte statique dans votre interface utilisateur. Ses options de configuration sont donc relativement limitées en dehors des propriétés de style (qui sont gérées par `toga.style.Pack`).
+
+Voici les options spécifiques au constructeur de `toga.Label` et ses propriétés principales :
+
+### Paramètres du constructeur `toga.Label()`
+
+1.  **`text` (obligatoire)** :
+
+      * Type : `str`
+      * Description : Le texte à afficher par le label. C'est le contenu principal du label.
+      * Exemple : `toga.Label("Bonjour, monde!")`
+
+2.  **`id` (optionnel)** :
+
+      * Type : `str` ou `None`
+      * Description : Un identifiant unique pour le widget. Utile pour référencer le widget de manière programmatique, surtout dans des structures complexes ou pour le débogage.
+      * Exemple : `toga.Label("Mon Label", id="mon_label_principal")`
+
+3.  **`style` (optionnel)** :
+
+      * Type : `toga.style.Pack` ou `None`
+      * Description : Un objet style `Pack` qui définit l'apparence et la mise en page du label. C'est ici que vous contrôlez la plupart des aspects visuels du label (couleur, taille de police, marges, etc.).
+      * Exemple :
+        ```python
+        from toga.style.pack import Pack, BOLD, RED
+
+        my_label = toga.Label(
+            "Important Message",
+            style=Pack(
+                font_weight=BOLD,
+                color=RED,
+                margin_bottom=10
+            )
+        )
+        ```
+        (Voir ma réponse précédente sur les options de `toga.style.Pack` pour plus de détails sur les styles.)
+
+4.  **`**kwargs` (optionnel)** :
+
+      * Toga permet souvent de passer des propriétés de style directement comme `kwargs` au constructeur du widget. Ces `kwargs` seront convertis en un objet `Pack` pour le style du widget.
+      * Exemple :
+        ```python
+        my_label = toga.Label(
+            "Another Label",
+            font_size=16,
+            color="green",
+            padding=(5, 5)
+        )
+        ```
+        Ceci est équivalent à :
+        ```python
+        from toga.style.pack import Pack
+        my_label = toga.Label(
+            "Another Label",
+            style=Pack(
+                font_size=16,
+                color="green",
+                padding=(5, 5)
+            )
+        )
+        ```
+
+### Propriétés modifiables après la création du Label
+
+Une fois qu'un `toga.Label` est créé, vous pouvez modifier son texte et son style :
+
+1.  **`label.text`**:
+
+      * Vous pouvez lire ou modifier le texte affiché par le label à tout moment.
+      * Exemple :
+        ```python
+        my_label = toga.Label("Texte initial")
+        # Plus tard dans votre code
+        my_label.text = "Nouveau texte mis à jour"
+        print(my_label.text) # Affiche "Nouveau texte mis à jour"
+        ```
+
+2.  **`label.style`**:
+
+      * L'attribut `.style` de l'objet `toga.Label` est une instance de `toga.style.Pack`. Vous pouvez modifier ses propriétés de la même manière que vous les définiriez lors de la création du widget.
+      * Exemple :
+        ```python
+        my_label = toga.Label("Changer de couleur")
+        # Plus tard
+        my_label.style.color = toga.BLUE
+        my_label.style.font_size = 20
+        ```
+
+### Comportement du `toga.Label`
+
+  * **Pas d'interactivité** : Un `toga.Label` est un widget passif. Il n'a pas d'événements (comme `on_press` pour un bouton) car il n'est pas destiné à être interactif.
+  * **Alignement et Multiligne** :
+      * L'alignement du texte (`text_align`) est géré via `label.style.text_align`.
+      * Depuis les versions récentes de Toga, les labels prennent en charge les retours à la ligne (`\n`) dans leur texte, ce qui permet d'afficher du texte sur plusieurs lignes sans avoir à créer plusieurs labels ou utiliser des astuces. Le retour à la ligne automatique (word wrapping) est un peu plus complexe et dépend des capacités natives de la plateforme.
+
+### Exemple simple d'utilisation
+
+```python
+import toga
+from toga.style.pack import Pack, COLUMN, CENTER, RED, BOLD
+
+class LabelApp(toga.App):
+    def startup(self):
+        main_box = toga.Box(
+            style=Pack(direction=COLUMN, padding=20, alignment=CENTER)
+        )
+
+        # Label simple avec style inline
+        self.hello_label = toga.Label(
+            "Bienvenue dans mon application Toga !",
+            style=Pack(font_size=20, color=RED, margin_bottom=15)
+        )
+        main_box.add(self.hello_label)
+
+        # Label avec texte modifiable
+        self.counter_label = toga.Label(
+            "Compteur: 0",
+            style=Pack(font_size=14, margin_bottom=10)
+        )
+        main_box.add(self.counter_label)
+
+        # Bouton pour incrémenter le compteur
+        self.count = 0
+        def increment_counter(widget):
+            self.count += 1
+            self.counter_label.text = f"Compteur: {self.count}"
+            if self.count >= 5:
+                self.counter_label.style.font_weight = BOLD
+                self.counter_label.style.color = toga.GREEN
+            else:
+                self.counter_label.style.font_weight = toga.NORMAL
+                self.counter_label.style.color = toga.BLACK
+
+
+        increment_button = toga.Button(
+            "Incrémenter",
+            on_press=increment_counter,
+            style=Pack(padding=5)
+        )
+        main_box.add(increment_button)
+
+        self.main_window = toga.MainWindow(title=self.formal_name)
+        self.main_window.content = main_box
+        self.main_window.show()
+
+def main():
+    return LabelApp('Label Demo', 'org.beeware.labeldemo')
+
+if __name__ == '__main__':
+    main().main_loop()
+```
+
+Comme vous pouvez le voir, la flexibilité du `toga.Label` réside principalement dans sa capacité à afficher du texte et à être entièrement stylisé via l'objet `toga.style.Pack`.

@@ -1,0 +1,136 @@
+Toga, faisant partie de la suite BeeWare, utilise un moteur de style appelé **Pack** qui s'inspire du modèle de boîte CSS (Cascading Style Sheets), mais dans une version simplifiée et adaptée aux applications natives.
+
+Voici les principales options de style que vous pouvez appliquer aux widgets Toga via l'objet `toga.style.Pack`:
+
+### Propriétés de mise en page (Layout Properties)
+
+Ces propriétés contrôlent le positionnement et le dimensionnement des widgets à l'intérieur de leurs conteneurs.
+
+  * **`direction`**: Définit la direction principale de disposition des éléments enfants dans une `toga.Box` (ou tout autre conteneur).
+      * `toga.COLUMN` (par défaut pour `toga.Box`): Les enfants sont empilés verticalement.
+      * `toga.ROW`: Les enfants sont alignés horizontalement.
+  * **`width`**: La largeur fixe du widget en pixels.
+  * **`height`**: La hauteur fixe du widget en pixels.
+  * **`flex`**: Contrôle la façon dont un widget s'étire ou se réduit par rapport aux autres widgets dans la direction de la mise en page.
+      * `0` (par défaut): Le widget conserve sa taille naturelle.
+      * `> 0`: Le widget "absorbera" l'espace disponible dans la direction de la mise en page. Plus la valeur est élevée, plus le widget prendra d'espace relatif aux autres widgets avec un `flex` non nul.
+  * **`margin`**: Définit la marge autour du widget. Peut être:
+      * Un seul entier (ex: `50`): Marge égale de 50px sur tous les côtés.
+      * Un tuple `(top, right, bottom, left)` (ex: `(10, 20, 10, 20)`): Marges spécifiques pour chaque côté.
+      * Un tuple `(vertical, horizontal)` (ex: `(10, 20)`): Marge verticale de 10px et horizontale de 20px.
+  * **`margin_top`, `margin_right`, `margin_bottom`, `margin_left`**: Marges spécifiques pour un côté donné.
+  * **`padding`**: Définit le remplissage (espace interne) à l'intérieur du widget. Fonctionne de la même manière que `margin`.
+  * **`padding_top`, `padding_right`, `padding_bottom`, `padding_left`**: Remplissages spécifiques.
+  * **`align_items`**: Contrôle l'alignement des éléments le long de l'axe transversal (cross-axis) d'un conteneur.
+      * `toga.CENTER`: Centre les éléments.
+      * `toga.START`: Aligne les éléments au début de l'axe transversal.
+      * `toga.END`: Aligne les éléments à la fin de l'axe transversal.
+      * `toga.STRETCH`: Étire les éléments pour remplir l'espace disponible.
+  * **`justify_content`**: Contrôle l'alignement des éléments le long de l'axe principal (main-axis) d'un conteneur.
+      * `toga.CENTER`: Centre les éléments.
+      * `toga.START`: Aligne les éléments au début.
+      * `toga.END`: Aligne les éléments à la fin.
+      * `toga.SPACE_BETWEEN`: Distribue l'espace également entre les éléments.
+      * `toga.SPACE_AROUND`: Distribue l'espace également autour des éléments.
+  * **`visibility`**: Définit si un widget est visible.
+      * `toga.VISIBLE` (par défaut): Le widget est affiché.
+      * `toga.HIDDEN`: Le widget n'est pas visible, mais il continue d'occuper de l'espace dans la mise en page.
+
+### Propriétés visuelles (Visual Properties)
+
+Ces propriétés contrôlent l'apparence des widgets.
+
+  * **`color`**: La couleur du texte ou du premier plan du widget. Accepte des noms de couleurs (ex: `toga.RED`, `toga.BLUE`) ou des codes hexadécimaux (ex: `"#FF0000"`).
+  * **`background_color`**: La couleur d'arrière-plan du widget. Accepte les mêmes formats que `color`.
+  * **`text_align`**: L'alignement horizontal du texte à l'intérieur du widget.
+      * `toga.LEFT`
+      * `toga.RIGHT`
+      * `toga.CENTER`
+      * `toga.JUSTIFY`
+  * **`text_direction`**: La direction du texte (utile pour les langues de droite à gauche).
+      * `toga.LTR` (Left-To-Right, par défaut)
+      * `toga.RTL` (Right-To-Left)
+
+### Propriétés de police (Font Properties)
+
+Ces propriétés contrôlent l'apparence du texte.
+
+  * **`font_family`**: La famille de polices à utiliser. Peut être une chaîne de caractères (ex: `"Arial"`, `"Times New Roman"`) ou une des constantes génériques de Toga:
+      * `toga.SYSTEM`: Utilise la police système par défaut.
+      * `toga.SERIF`
+      * `toga.SANS_SERIF`
+      * `toga.CURSIVE`
+      * `toga.FANTASY`
+      * `toga.MONOSPACE`
+  * **`font_size`**: La taille de la police en points (pt).
+  * **`font_weight`**: Le poids de la police (graisse).
+      * `toga.NORMAL`
+      * `toga.BOLD`
+  * **`font_style`**: Le style de la police.
+      * `toga.NORMAL`
+      * `toga.ITALIC`
+  * **`font_variant`**: La variante de la police (ex: petites capitales).
+      * `toga.NORMAL`
+      * `toga.SMALL_CAPS`
+
+### Comment utiliser les options de style
+
+Vous pouvez appliquer ces styles de plusieurs manières:
+
+1.  **Directement lors de la création du widget:**
+
+    ```python
+    import toga
+    from toga.style.pack import Pack, COLUMN, RED, CENTER
+
+    # ...
+    my_button = toga.Button(
+        "Cliquer ici",
+        on_press=my_handler,
+        style=Pack(
+            background_color=RED,
+            margin=10,
+            flex=1,
+            text_align=CENTER
+        )
+    )
+
+    my_box = toga.Box(
+        style=Pack(
+            direction=COLUMN,
+            padding=(5, 10)
+        )
+    )
+    # ...
+    ```
+
+2.  **Après la création du widget, via l'attribut `.style`:**
+
+    ```python
+    import toga
+    from toga.style.pack import Pack, BLUE, BOLD
+
+    my_label = toga.Label("Mon texte")
+    my_label.style.color = BLUE
+    my_label.style.font_weight = BOLD
+    my_label.style.margin_top = 20
+    ```
+
+3.  **Mettre à jour plusieurs propriétés avec `.update()`:**
+
+    ```python
+    import toga
+    from toga.style.pack import Pack, ROW, RED
+
+    my_box = toga.Box()
+    my_box.style.update(direction=ROW, background_color=RED, padding=15)
+    ```
+
+### Points importants à retenir sur le style Toga :
+
+  * **Native vs. CSS-like**: Bien qu'il s'inspire de CSS (en particulier Flexbox), Toga utilise les widgets natifs de chaque plateforme. Cela signifie que le rendu final peut légèrement varier d'une plateforme à l'autre car il respecte les conventions du système d'exploitation.
+  * **Simplifié**: Le système de style de Toga est intentionnellement plus simple que CSS complet. Il n'y a pas de gestion des `overflow`, des `float`, ou de sélecteurs complexes. L'objectif est de fournir un contrôle de base et cohérent sur toutes les plateformes natives.
+  * **Pas de "classes" ou "IDs" CSS**: Vous stylisez directement les objets `toga.Widget` ou `toga.Box` ou leurs instances.
+  * **`PackMixin`**: La plupart des widgets Toga incluent `PackMixin`, ce qui vous permet d'accéder directement aux propriétés de style sans passer par `.style.` (ex: `widget.color` au lieu de `widget.style.color`). Cependant, il est généralement recommandé d'utiliser `widget.style.prop_name` pour la clarté et la cohérence.
+
+Pour une liste complète et les détails les plus à jour, il est toujours préférable de consulter la [documentation officielle de Toga sur le moteur de style Pack](https://toga.readthedocs.io/en/stable/reference/style/pack.html).
