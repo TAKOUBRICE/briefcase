@@ -4,38 +4,33 @@ application de gestion des visiteurs
 
 import toga
 from toga.style import Pack
-from toga.style.pack import COLUMN, ROW
+from toga.style.pack import COLUMN, ROW, CENTER
+from .gbstyle import bootstyle, col
 
 
 class HelloWorld(toga.App):
-    async def say_hello(self, widget):
-            await self.main_window.dialog(toga.InfoDialog(f"Hello, {self.name_input.value}", "Hi there!",))
+    """ Premier teste de gbstyle """
     def startup(self):
-        """Construct and show the Toga application.
-
-        Usually, you would add your application to a main content box.
-        We then create a main window (with a name matching the app), and
-        show the main window.
-        """
-        main_box = toga.Box(direction=COLUMN)
-        # label: pour afficher un texte
-        name_label = toga.Label("Your name: ",margin=(0, 5), )
-        # text input: pour saisir du texte
-        # flex=1: pour que le champ prenne tout l'espace disponible
-        self.name_input = toga.TextInput(flex=1)
-        name_box = toga.Box(direction=ROW, margin=5)
-        name_box.add(name_label)
-        name_box.add(self.name_input)
+        main_box = toga.Box(direction=COLUMN, style = Pack(background_color= col['gray-200']))
+        #class gbstyle
+        self.gbstyle = bootstyle(self)
+        boxp = toga.Box(direction=ROW, flex = 0, text_align= CENTER, background_color= col['primary-subtle'])
         
-        button = toga.Button("Say Hello!", on_press= self.say_hello, margin=5,)
-        main_box.add(name_box)
-        main_box.add(button)
-
+        #hr = self.gbstyle.hr()
+        h = self.gbstyle.h('Premier teste de gbstyle', nb= 16)
+        textPrimaire =  self.gbstyle.textPrimary('couleur primaire')
+        
+        boxp.add(h)
+        boxp.add(textPrimaire)
+        # integrer le box principale
+        #main_box.add(h)
+        main_box.add(boxp)
+        #main_box.add(textPrimaire)
+        
+        
         self.main_window = toga.MainWindow(title=self.formal_name)
         self.main_window.content = main_box
-        self.main_window.show()
-
-        
+        self.main_window.show()       
 
 def main():
     return HelloWorld()
