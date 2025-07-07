@@ -5,32 +5,36 @@ application de gestion des visiteurs
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW, CENTER
-from .gbstyle import bootstyle, col
+from toga.constants import Direction
+#from .gbboot import *
+from .gbstyle import *
+
 
 
 class HelloWorld(toga.App):
     """ Premier teste de gbstyle """
     def startup(self):
-        main_box = toga.Box(direction=COLUMN, style = Pack(background_color= col['gray-200']))
-        #class gbstyle
-        self.gbstyle = bootstyle(self)
-        boxp = toga.Box(direction=ROW, flex = 0, text_align= CENTER, background_color= col['primary-subtle'])
+        main_box = toga.Box(style=Pack(direction=COLUMN, padding=20, alignment=CENTER,flex=1, background_color=col['gray-200']))
+
+        # teste des alert
+        primary = alertPrimary(self, 'Ceci est un message d\'alerte primaire')
+        secondary = alertSecondary(self, 'Ceci est un message d\'alerte secondaire')
+        danger = alertDanger(self, 'Ceci est un message d\'alerte danger')
+        success = alertSuccess(self, 'Ceci est un message d\'alerte succès')
+        info = alertInfo(self, 'Ceci est un message d\'alert info')
+        Warning = alertWarning(self, 'Ceci est un message d\'alert Warning')
         
-        #hr = self.gbstyle.hr()
-        h = self.gbstyle.h('Premier teste de gbstyle', nb= 16)
-        textPrimaire =  self.gbstyle.textPrimary('couleur primaire')
-        
-        boxp.add(h)
-        boxp.add(textPrimaire)
-        # integrer le box principale
-        #main_box.add(h)
-        main_box.add(boxp)
-        #main_box.add(textPrimaire)
-        
-        
+        main_box.add(primary.get_alert())
+        main_box.add(secondary.get_alert())
+        main_box.add(danger.get_alert())
+        main_box.add(success.get_alert())
+        main_box.add(info.get_alert())
+        main_box.add(Warning.get_alert())
+        container = toga.ScrollContainer(content=main_box)
+        # Crée la fenêtre principale
         self.main_window = toga.MainWindow(title=self.formal_name)
-        self.main_window.content = main_box
-        self.main_window.show()       
+        self.main_window.content = container
+        self.main_window.show()      
 
 def main():
     return HelloWorld()

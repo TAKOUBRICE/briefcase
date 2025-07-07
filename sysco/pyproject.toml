@@ -21,7 +21,10 @@ test_sources = [
 ]
 
 requires = [
+    "gbboot",
     "gbstyle",
+    "gbexception",
+    "gbmsg",
 ]
 test_requires = [
     "pytest",
